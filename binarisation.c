@@ -64,7 +64,7 @@ Uint32 s( SDL_Surface*img, int x, int y)
 	   tot +=get_pixel(img, i, j);
 	 }
       }
-      final = pow((tot-mean(img,x,y)),2)/pow(60,2);
+     final = sqrt((pow((tot-mean(img,x,y)),2)/pow(60,2)));
    }
 
   return final;
@@ -84,11 +84,13 @@ void binarisation(SDL_Surface*img)
 	  Uint32 T = mean(img,x,y)*(1+0.4*((s(img,x,y)/128)-1));
 	    if(get_pixel(img, x, y)< T)
 	      {
-		 put_pixel(img, x, y, 0);
+		Uint32 pixel=SDL_MapRGB(img->format, 0, 0, 0);
+		put_pixel(img, x, y, pixel);
 	      }
 	    else
 	      {
-		put_pixel(img, x, y, 1);
+		Uint32 pixel=SDL_MapRGB(img->format, 255, 255, 255);
+		put_pixel(img, x, y,pixel);
 	      }
 	}
     }
