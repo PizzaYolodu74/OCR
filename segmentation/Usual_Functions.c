@@ -14,7 +14,7 @@
 // top to bottom and left to right as the cutting function work
 
 
-void cut_matrix(char* M,size_t i=0,size_t j=0,size_t length,size_t width){ //verifier si size_t i = 0 fonctionne pour les tests
+void cut_matrix(char* M,size_t i=0,size_t j=0,size_t length,size_t width){
     L=malloc(2*sizeof(char));
     size_t sizeM = sizeof(M)/sizeof(M[0]);
     if (i){

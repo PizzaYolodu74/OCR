@@ -9,27 +9,7 @@
 #include <stdio.h>
 #include <math.h>
 
-/*
-//USUAL METHODS FOR SDL images
-SDL_Surface* img;
-img = load_image("my_image.jpg");
-int width=img->w;
-int height->h;
 
-Uint8 r, g ,b;//changer en int si on fait des calculs dessin
-SDL_GetRGB(pixel, img->format, &r, &g, &b);
-Uint32 pixel;
-pixel = get_pixel(img, h, l);//h represente la hauteur!
-pixel = SDL_MapRGB(img->format, 255, 255, 255);//place les valeurs rgb
-putpixel(output_img,i,j,pixel);
-*/
-
-/*
-// Prompt the angle we want to rotate
-float degree_angle;
-printf("Enter the degree you want to rotate the image (counterclockwise!).\n");//ccw=counterclockwise
-scanf("%f", &degree_angle);
-*/
 
 SDL_Surface* rotate (SDL_Surface* img, int height, int width)
 {

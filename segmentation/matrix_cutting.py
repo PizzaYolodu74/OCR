@@ -1,40 +1,51 @@
+from PIL import Image
+import numpy as np
+
+
 ################################################################################################################
 #                                         Usual fonctions for the cutting                                      #
 ################################################################################################################
 
 
-# Cut the matrix according to a height i or a width j
+# Cut the matrix according to the i or j cut_list depending of height or width
 # the cutting function preserve the reading direction because in occidental language,
 # we read from top to bottom and from left to right as the cutting function work
+
 def cut_matrix(M, i, j):
+    if not i and not j:
+        return M
     L = []
     if i:
-        # Allow to have two matrix with i lines and len(M)-i lines from one matrix
+        # Allow to have len(i) matrix from one matrix
+        pos = 0
+        for posi in i:
+            M0 = []
+            for line in range(pos, posi):
+                M0.append(M[line])
+            L.append(M0)
+            pos = posi
         M0 = []
-        M1 = []
-        for line in range(i):
+        for line in range(pos, len(M)):
             M0.append(M[line])
-        for line in range(i, len(M)):
-            M1.append(M[line])
         L.append(M0)
-        L.append(M1)
 
-    elif j:
-        # Allow to have two matrix with j columns and len(M[0])-j column from one matrix
-        M2 = []
-        M3 = []
+    else:
+        # Allow to have len(j) matrix from one matrix
+        pos = 0
+        for posj in j:
+            M0 = []
+            for line in range(len(M)):
+                M0.append([])
+                for col in range(pos, posj):
+                    M0[line].append(M[line][col])
+            L.append(M0)
+            pos = posj
+        M0 = []
         for line in range(len(M)):
-            M2.append([])
-            for col in range(j):
-                M2[line].append(M[line][col])
-        for line in range(len(M)):
-            M3.append([])
-            for col in range(j, len(M[0])):
-                M3[line].append(M[line][col])
-        L.append(M2)
-        L.append(M3)
-    elif i == 0 or j == 0 or i == len(M) or j == len(M[0]):
-        return M
+            M0.append([])
+            for col in range(pos, len(M[0])):
+                M0[line].append(M[line][col])
+        L.append(M0)
     return L
 
 
@@ -52,6 +63,7 @@ def thresholding(H, s, l):
     # Allow to choose where we need to cut in function of the threshold
     n = 0
     L = []
+
     for i in range(len(H)):
         if H[i] == l:
             n += 1
@@ -65,7 +77,7 @@ def thresholding(H, s, l):
 # Remove white borders from the matrix
 def wipe_white_borders(M):
     M = wipe_vertical(M)
-    return wipe_horizontal(M)
+    return wipe_horizontal(M) if M else None
 
 
 # Remove vertical white borders from the matrix by using a histogram and searching white column at the begin or
@@ -158,7 +170,6 @@ def adjust_matrix_size(M):
             for i in range(16):
                 adjusted_M.append([])
                 for j in range(16):
-
                     adjusted_M[i].append(M[(int)(i * height_factor_)][(int)(j * width_factor)])
         else:
             for i in range(16):
@@ -202,6 +213,7 @@ def vertical(M, h):
             HV[col] += (M[line][col] // 255)
 
     # handles thresholding using the threshold and the full histogram
+
     cut_list = thresholding(HV, s, l)
 
     # we make a list of cut areas and if this one is empty we will stop either if
@@ -211,20 +223,11 @@ def vertical(M, h):
     elif not cut_list:
         return horizontal(M, False)
     else:
-        matrix_list = [M]
-        matrix_list2 = []
-        count = 0
-        index = 0
-
         # proceed the matrix cutting for each column of the cut-list
-        for col in cut_list:
-            to_cut_matrix = matrix_list[count]
-            matrix_list.pop()
-            matrix_list += cut_matrix(to_cut_matrix, None, col - index)
-            count += 1
-            index += col
+        matrix_list = cut_matrix(M, [], cut_list)
 
         # make a recursive horizontal call for each of the new matrix
+        matrix_list2 = []
         for matrix in matrix_list:
             matrix_list2 += horizontal(matrix, True)
         return matrix_list2
@@ -255,19 +258,11 @@ def horizontal(M, v):
     elif not cut_list:
         return vertical(M, False)
     else:
-        matrix_list = [M]
-        matrix_list2 = []
-        count = 0
-        index = 0
         # proceed the matrix cutting for each column of the cut-list
-        for line in cut_list:
-            to_cut_matrix = matrix_list[count]
-            matrix_list.pop()
-            matrix_list += cut_matrix(to_cut_matrix, line - index, None)
-            count += 1
-            index += line
+        matrix_list = cut_matrix(M, cut_list, [])
 
         # make a recursive horizontal call for each of the new matrix
+        matrix_list2 = []
         for little_matrix in matrix_list:
             matrix_list2 += vertical(little_matrix, True)
         return matrix_list2
@@ -291,17 +286,7 @@ def lines(M):
     if not cut_list:
         return [M]
     else:
-        matrix_list = [M]
-        count = 0
-        index = 0
-        for line in cut_list:
-            to_cut_matrix = matrix_list[count]
-            matrix_list.pop()
-            matrix_list += cut_matrix(to_cut_matrix, line - index, None)
-            count += 1
-            index += line
-
-        return matrix_list
+        return cut_matrix(M, cut_list, [])
 
 
 ################################################################################################################
@@ -322,18 +307,7 @@ def cols(M, s):
     if not cut_list:
         return [M]
     else:
-        matrix_list = [M]
-        count = 0
-        index = 0
-
-        for col in cut_list:
-            to_cut_matrix = matrix_list[count]
-            matrix_list.pop()
-            matrix_list += cut_matrix(to_cut_matrix, None, col - index)
-            count += 1
-            index += col
-
-        return matrix_list
+        return cut_matrix(M, [], cut_list)
 
 
 ################################################################################################################
@@ -378,8 +352,11 @@ def from_picture_matrix_to_char_matrix(M):
                 word = wipe_white_borders(word)
                 chars = cols(word, sc)
                 new_chars = []
+                i = 0
                 for char in chars:
                     char = adjust_matrix_size(wipe_white_borders(char))
+                    save(char, i)
+                    i += 1
                     new_chars.append(char)
                 char_matrix[w][c].append(new_chars)
             c += 1
@@ -405,37 +382,69 @@ def from_pic_to_matrix(img):
 
 
 def printlistofmatrix(M):
+    j = 0
     for i in M:
+        j += 1
         print(i)
 
 
 # Thresholds for detecting paragraphs, lines ,words and chars
-s = 3
-sw = 2
-sc = 1
-sl = 1
+s = 15
+sl = 3
+sw = 5
+sc = 0
 
 
-#test with a tiny picture
-"""
-M = [[255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 0  , 255, 255, 255, 255, 255, 255, 0  , 0  , 255, 255, 0  , 0  , 0  , 0  , 255, 255, 255, 0  , 255],
-     [255, 0  , 255, 255, 255, 255, 255, 255, 0  , 0  , 255, 255, 0  , 255, 255, 0  , 255, 255, 255, 0  , 255],
-     [255, 0  , 255, 255, 255, 255, 255, 255, 0  , 0  , 255, 255, 0  , 0  , 0  , 0  , 255, 255, 255, 0  , 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 0  , 255, 255, 255, 255, 255, 255, 0  , 0  , 255, 255, 0  , 255, 255, 0  , 255, 255, 255, 0  , 255],
-     [255, 0  , 255, 255, 255, 255, 255, 255, 255, 0  , 255, 255, 0  , 0  , 0  , 0  , 255, 255, 255, 0  , 255],
-     [255, 0  , 255, 255, 255, 255, 255, 255, 0  , 0  , 255, 255, 0  , 255, 255, 0  , 255, 255, 255, 0  , 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 0  , 255, 255, 255, 255, 255, 255, 0  , 0  , 255, 255, 255, 255, 0  , 255, 255, 255, 255, 0  , 255],
-     [255, 0  , 255, 255, 255, 255, 255, 255, 255, 0  , 255, 255, 255, 0  , 0  , 0  , 255, 255, 255, 0  , 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-     [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]]"""
+def save(Mexempleparagraph, i):
+    ##im = Image.fromarray(Mexempleparagraph)
 
-# print(from_picture_matrix_to_char_matrix(M))
+    numpy_image = np.array(Mexempleparagraph)
+    PIL_image = Image.fromarray(np.uint8(numpy_image)).convert('RGB')
+    namefile = "results/" + str(i)
+    PIL_image.save(namefile + ".bmp")
+
+
+#  tests  #
+
+# from_picture_matrix_to_char_matrix(Mexempleparagraph)
+
+Mexempleparagraph = []
+img = Image.open("tests/binarisation.bmp")
+width, height = img.size
+for x in range(height):
+    Mexempleparagraph.append([])
+    for y in range(width):
+        Mexempleparagraph[x].append(img.getpixel((y, x))[0])
+
+save(Mexempleparagraph, "exempleparagraph")
+
+
+def main(M):
+    M = wipe_white_borders(M)
+    M0 = horizontal(M, True)
+    for i in range(len(M0)):
+        if (M0[i][0]):
+            paragraph = wipe_white_borders(M0[i])
+            if paragraph:
+                __main(paragraph)
+                #save(paragraph, i)
+
+def __main(M):
+    M = wipe_white_borders(M)
+    M0 = lines(M)
+    for i in range(len(M0)):
+        if (M0[i][0]):
+            line = wipe_white_borders(M0[i])
+            if line:
+                ____main(line)
+                #save(line, i)
+
+def ____main(M):
+    M = wipe_white_borders(M)
+    M0 = cols(M,sc) ##for char
+    for i in range(len(M0)):
+        if (M0[i][0]):
+            word = wipe_white_borders(M0[i])
+            if word:
+                save(word, i)
+main(Mexempleparagraph)

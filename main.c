@@ -1,7 +1,3 @@
-//
-// Created by Paul-alexandre
-//
-
 #include ""
 #include ""
 #include ""
