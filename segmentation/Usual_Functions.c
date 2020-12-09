@@ -17,18 +17,18 @@
 // language,
 // we read from top to bottom and from left to right as the cutting function work
 
-void cut_matrix(struct Image img,struct Image matrix_list[],int *cut_list
-        ,int length,char vertical){
+void cut_matrix(Image img,Image matrix_list[],size_t *cut_list
+        ,size_t length,char vertical){
     if (length==0){
-        struct Image matrix_list[1]={img};
+        Image matrix_list[1]={img};
         return;
     }
     if (vertical){                  // (length cuts= length+1 structs)
         // Allow to have length matrix from one matrix
-        int pos = img.begin_h;
-        for (int posi = 0; posi < length; ++posi) {
-            int height = *(cut_list+posi)-pos;
-            struct Image new_img = {
+        size_t pos = img.begin_h;
+        for (size_t posi = 0; posi < length; ++posi) {
+            size_t height = *(cut_list+posi)-pos;
+            Image new_img = {
                     pos,            // begin_h
                     img.begin_w,    // begin_w
                     height,         // height
@@ -37,7 +37,7 @@ void cut_matrix(struct Image img,struct Image matrix_list[],int *cut_list
             matrix_list[posi]=new_img;
             pos=*(cut_list+posi);   // move the origin to the next position
         }
-        struct Image new_img = {
+        Image new_img = {
                 pos,                  // begin_h
                 img.begin_w,          // begin_w
                 img.height+img.begin_h-pos,// height
@@ -48,10 +48,10 @@ void cut_matrix(struct Image img,struct Image matrix_list[],int *cut_list
     }
     else{
          // Allow to have length matrix from one matrix
-        int pos = img.begin_w;
-        for (int posi = 0; posi < length; ++posi) {
-            int width = *(cut_list+posi)-pos;
-            struct Image new_img = {
+        size_t pos = img.begin_w;
+        for (size_t posi = 0; posi < length; ++posi) {
+            size_t width = *(cut_list+posi)-pos;
+            Image new_img = {
                     img.begin_h,    // begin_h
                     pos,            // begin_w
                     img.height,     // height
@@ -60,7 +60,7 @@ void cut_matrix(struct Image img,struct Image matrix_list[],int *cut_list
             matrix_list[posi]=new_img;
             pos=*(cut_list+posi);   // move the origin to the next position
         }
-        struct Image new_img = {
+        Image new_img = {
                 img.begin_h               // begin_h
                 pos,                      // begin_w
                 img.height,               // height
@@ -117,7 +117,7 @@ size_t[] thresholding(size_t H[],size_t Hlength,size_t s,
 
 //todo: il peut etre opti d'appeler wipe dans les fonctions de cutting en
 // ayant deja en parametre l'histogramme
-void wipe_white_borders(char *M,struct Image input,struct Image img){
+void wipe_white_borders(char *M,Image input,Image img){
     // Vertical run
     size_t HV[img.width];
     create_histogram(img.width, HV);
@@ -137,7 +137,7 @@ void wipe_white_borders(char *M,struct Image input,struct Image img){
         /// totalement vide, pour le moment la structure reste juste vide
         return;
     ///todo: si un pb, ça peut venir d'ici
-    while (width_max>begin.w && HV[width_max-1]==img.height){
+    while (width_max>img.begin_w && HV[width_max-1]==img.height){
         img.width--;
         width_max--;
     }
@@ -168,28 +168,21 @@ void wipe_white_borders(char *M,struct Image input,struct Image img){
 
 }
 
-/* todo: resize >16 cassé
-char* resize(char *M,size_t left,size_t right,size_t l,size_t left0,size_t right0,size_t l0){
-    char newM[right-left];
-    for (int i = left; i < right; ++i) {
-        newM[i-left]=M[i];
-    }
-}
-*/
 
-char* square_reshaped(char *M,struct Image input, struct Image img, char
+
+char* square_reshaped(char *M,Image input, Image img, char
         *new_M, char vertical){
     if (vertical==1){
         char newM[img.height*img.height];
-        for (int line = 0; line < img.height; ++line) {
-            for (int col = 0; col < (img.height-img.width)/2; ++col) {
+        for (size_t line = 0; line < img.height; ++line) {
+            for (size_t col = 0; col < (img.height-img.width)/2; ++col) {
                 *(newM+line*img.width+col)=255;
             }
-            for (int col = (img.height-img.width)/2;
+            for (size_t col = (img.height-img.width)/2;
             col < img.width+(img.height-img.width)/2; ++col) {
                 *(newM+line*img.width+col)=*(M+line*input.width+col);
             }
-            for (int col = img.width+(img.height-img.width)/2;
+            for (size_t col = img.width+(img.height-img.width)/2;
             col < img.height; ++col) {
                 *(newM+line*img.width+col)=255;
             }
@@ -197,15 +190,15 @@ char* square_reshaped(char *M,struct Image input, struct Image img, char
     }
     else{
         char newM[img.width*img.width];
-        for (int line = 0; line < img.width; ++line) {
-            for (int col = 0; col < (img.width-img.height)/2; ++col) {
+        for (size_t line = 0; line < img.width; ++line) {
+            for (size_t col = 0; col < (img.width-img.height)/2; ++col) {
                 *(newM+line*img.height+col)=255;
             }
-            for (int col = (img.width-img.height)/2;
+            for (size_t col = (img.width-img.height)/2;
                  col < img.height+(img.width-img.height)/2; ++col) {
                 *(newM+line*img.height+col)=*(M+line*input.height+col);
             }
-            for (int col = img.height+(img.width-img.height)/2;
+            for (size_t col = img.height+(img.width-img.height)/2;
                  col < img.width; ++col) {
                 *(newM+line*img.height+col)=255;
             }
@@ -215,7 +208,7 @@ char* square_reshaped(char *M,struct Image input, struct Image img, char
 }
 
 /*
-char* adjust_matrix_size(char *M,struct Image input, struct Image img, char
+char* adjust_matrix_size(char *M,Image input, Image img, char
 *new_M, char vertical){
     if (img.height<16){
         if (img.width<16){
@@ -234,8 +227,8 @@ char* adjust_matrix_size(char *M,struct Image input, struct Image img, char
             if (img.height==img.width){
                 char *square_M = M;
             }
-            for (int i = 0; i < 16; ++i) {
-                for (int j = 0; j < 16; ++j) {
+            for (size_t i = 0; i < 16; ++i) {
+                for (size_t j = 0; j < 16; ++j) {
                     *(new_M+
                 }
             }
@@ -248,3 +241,12 @@ char* adjust_matrix_size(char *M,struct Image input, struct Image img, char
 
 }
  */
+
+/* todo: resize >16 cassé
+char* resize(char *M,size_t left,size_t right,size_t l,size_t left0,size_t right0,size_t l0){
+    char newM[right-left];
+    for (size_t i = left; i < right; ++i) {
+        newM[i-left]=M[i];
+    }
+}
+*/

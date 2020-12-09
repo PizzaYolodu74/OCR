@@ -15,7 +15,7 @@
 // we use the h or v boolean var to know if the last call was negative or not
 // return the list of cut matrix
 // The input struct is for the initial picture, struct img is the actual image.
-struct Image[] vertical(char*M,struct Image input,struct Image img,char h,
+Image[] vertical(char*M,Image input,Image img,char h,
         size_t s,size_t *cut_list_length){
 
     // Creates the histogram whose variables are the number of white pixels
@@ -38,7 +38,7 @@ struct Image[] vertical(char*M,struct Image input,struct Image img,char h,
     // either if the horizontal call is negative either immediately if the
     // last horizontal call was negative
     if (cut_list_length==0 && h==0){
-        struct Image matrix_list[1]={img};
+        Image matrix_list[1]={img};
         return matrix_list;
     }
     else{
@@ -55,7 +55,7 @@ struct Image[] vertical(char*M,struct Image input,struct Image img,char h,
             }
 ///////////////////////////////////////////////////////////////////////////
             // Proceed the matrix cutting for each column of the cut-list
-            struct Image matrix_list[cut_list_length+1];
+            Image matrix_list[cut_list_length+1];
             cut_matrix(M,img,matrix_list,cut_list,cut_list_length,1);
 
             // Make a recursive horizontal call for each of the new matrix
@@ -66,7 +66,7 @@ struct Image[] vertical(char*M,struct Image input,struct Image img,char h,
             size_t *cut_Hlist_length;
 /// todo: test si *matrix_list2_length bien est utilisé pour l'array
 /// après l'appel de concatenate
-            struct Image matrix_list2[*matrix_list2_length]=
+            Image matrix_list2[*matrix_list2_length]=
                     concatenate(matrix_list2,horizontal
                     (M,matrix_list[pos],1,s,cut_Hlist_length)
                             ,matrix_list2_length,cut_Hlist_length);
@@ -76,7 +76,7 @@ struct Image[] vertical(char*M,struct Image input,struct Image img,char h,
                 size_t *cut_Hlist_length;
 /// todo: test si *matrix_list2_length bien est utilisé pour l'array
 /// après l'appel de concatenate
-                struct Image matrix_list2[matrix_list2_length]=
+                Image matrix_list2[matrix_list2_length]=
                         concatenate(matrix_list2,horizontal
                         (M,matrix_list[pos],1,s,cut_Hlist_length)
                                     ,matrix_list2_length,cut_Hlist_length);
@@ -98,7 +98,7 @@ struct Image[] vertical(char*M,struct Image input,struct Image img,char h,
 // we use the h or v boolean var to know if the last call was negative or not
 // return the list of cut matrix
 // The input struct is for the initial picture, struct img is the actual image.
-struct Image[] horizontal(char*M,struct Image input, struct Image img,char v,
+Image[] horizontal(char*M,Image input, Image img,char v,
         size_t s,size_t *cut_list_length){
     // Creates the histogram whose variables are the number of white pixels
     // on each row of the matrix
@@ -116,7 +116,7 @@ struct Image[] horizontal(char*M,struct Image input, struct Image img,char v,
     // We make a list of cut areas and if this one is empty we will stop either if
     // the horizontal call is negative either immediately if the last horizontal call was negative
     if (cut_list_length==0 && v==0){
-        struct Image matrix_list[1]={img};
+        Image matrix_list[1]={img};
         return matrix_list;
     }
     else{
@@ -135,7 +135,7 @@ struct Image[] horizontal(char*M,struct Image input, struct Image img,char v,
 ///////////////////////////////////////////////////////////////////////////
 
             // Proceed the matrix cutting for each column of the cut-list
-            struct Image matrix_list[cut_list_length+1];
+            Image matrix_list[cut_list_length+1];
             ///todo:tester si un array se comporte comme une liste python
             cut_matrix(M,img,matrix_list,cut_list,cut_list_length,0);
 
@@ -145,7 +145,7 @@ struct Image[] horizontal(char*M,struct Image input, struct Image img,char v,
             // The concatenate function modify matrix_list2_length to the new concatenate size
             size_t *cut_Vlist_length;
             /// todo: test si *matrix_list2_length bien est utilisé pour l'array après l'appel de concatenate
-            struct Image matrix_list2[*matrix_list2_length]=
+            Image matrix_list2[*matrix_list2_length]=
                     concatenate(matrix_list2,horizontal(M,matrix_list[pos],1,s,cut_Vlist_length)
                             ,matrix_list2_length,cut_Vlist_length);
             free(cut_Vlist_length);
@@ -153,7 +153,7 @@ struct Image[] horizontal(char*M,struct Image input, struct Image img,char v,
             for (int pos = 1; pos < cut_list_length+1; ++pos) {
                 size_t *cut_Vlist_length;
                 /// todo: test si *matrix_list2_length bien est utilisé pour l'array après l'appel de concatenate
-                struct Image matrix_list2[matrix_list2_length]=
+                Image matrix_list2[matrix_list2_length]=
                         concatenate(matrix_list2,vertical(M,matrix_list[pos],1,s,cut_Vlist_length)
                                 ,matrix_list2_length,cut_Vlist_length);
                 free(cut_Vlist_length);
@@ -168,7 +168,7 @@ struct Image[] horizontal(char*M,struct Image input, struct Image img,char v,
 }
 
 
-struct Image[] lines(char *M, struct Image input,struct Image img, size_t
+Image[] lines(char *M, Image input,Image img, size_t
         *cut_list_length){
     // Creates the histogram whose variables are the number of white pixels on each row of the matrix
     size_t HL[img.height];
@@ -188,7 +188,7 @@ struct Image[] lines(char *M, struct Image input,struct Image img, size_t
     // We make a list of cut areas and if this one is empty we will stop either if
     // the horizontal call is negative either immediately if the last horizontal call was negative
     if (cut_list_length==0){
-        struct Image matrix_list[1]={img};
+        Image matrix_list[1]={img};
         return matrix_list;
     }
     else{
@@ -201,7 +201,7 @@ struct Image[] lines(char *M, struct Image input,struct Image img, size_t
         }
 ///////////////////////////////////////////////////////////////////////////
 
-        struct Image matrix_list[cut_list_length+1];
+        Image matrix_list[cut_list_length+1];
         ///todo:tester si un array se comporte comme une liste python
         cut_matrix(M,img,matrix_list,cut_list,cut_list_length,0);
         return matrix_list;
@@ -212,7 +212,7 @@ struct Image[] lines(char *M, struct Image input,struct Image img, size_t
 }
 
 ///todo: fonction seuil words et chars (pour s)
-struct Image[] cols(char *M, size_t s, struct Image input,struct Image img, size_t *cut_list_length){
+Image[] cols(char *M, size_t s, Image input,Image img, size_t *cut_list_length){
     // Creates the histogram whose variables are the number of white pixels on each row of the matrix
     size_t HC[img.width];
     create_histogram(img.width, HC);
@@ -229,7 +229,7 @@ struct Image[] cols(char *M, size_t s, struct Image input,struct Image img, size
     // We make a list of cut areas and if this one is empty we will stop either if
     // the horizontal call is negative either immediately if the last horizontal call was negative
     if (cut_list_length==0){
-        struct Image matrix_list[1]={img};
+        Image matrix_list[1]={img};
         return matrix_list;
     }
     else{
@@ -241,7 +241,7 @@ struct Image[] cols(char *M, size_t s, struct Image input,struct Image img, size
             cut_list[i]+=begin.h;
         }
 ///////////////////////////////////////////////////////////////////////////
-        struct Image matrix_list[cut_list_length+1];
+        Image matrix_list[cut_list_length+1];
         ///todo:tester si un array se comporte comme une liste python
         cut_matrix(M,img,matrix_list,cut_list,cut_list_length,1);
         return matrix_list;
