@@ -110,7 +110,7 @@ size_t* thresholding(size_t H[],size_t Hlength,size_t s,
                 // add the middle of the place where we need to cut in
                 // the cut_list
                 cut_list[*cut_list_length]=(index-(n/2));
-                *cut_list_length++;
+                *cut_list_length+=1;
             }
             n=0;
         }

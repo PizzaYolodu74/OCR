@@ -47,7 +47,7 @@ Image* vertical(char*M,Image input,Image img,char h,
         else{
             // Set the position to cut starting at the beginning of the matrix:
             // img.begin_h .
-            for (int i = 0; i < *cut_list_length; ++i) {
+            for (size_t i = 0; i < *cut_list_length; ++i) {
                 *(cut_list+i)+=img.begin_h;
             }
 
@@ -57,7 +57,7 @@ Image* vertical(char*M,Image input,Image img,char h,
             cut_matrix(img,matrix_list,cut_list,*cut_list_length,1);
 
             // Make a recursive horizontal call for each of the new matrix
-            size_t *cut_Hlist_length;
+            size_t *cut_Hlist_length=0;
             Image *matrix_list2 =
                     horizontal(M,input,*(matrix_list),1,s,cut_Hlist_length);
             size_t matrix_list2_length=*cut_Hlist_length;
@@ -116,7 +116,7 @@ Image* horizontal(char*M,Image input, Image img,char v,
         else{
             // Set the position to cut starting at the beginning of the matrix:
             // img.begin_w .
-            for (int i = 0; i < *cut_list_length; ++i) {
+            for (size_t i = 0; i < *cut_list_length; ++i) {
                 *(cut_list+i)+=img.begin_w;
             }
 
@@ -126,8 +126,9 @@ Image* horizontal(char*M,Image input, Image img,char v,
             cut_matrix(img,matrix_list,cut_list,*cut_list_length,0);
 
             // Make a recursive vertical call for each of the new matrix
-            // The concatenate function modify matrix_list2_length to the new concatenate size
-            size_t *cut_Vlist_length;
+            // The concatenate function modify matrix_list2_length to the
+            // new concatenate size
+            size_t *cut_Vlist_length=0;
             Image *matrix_list2 =
                     vertical(M,input,*(matrix_list),1,s,cut_Vlist_length);
             size_t matrix_list2_length=*cut_Vlist_length;
@@ -175,7 +176,7 @@ Image* lines(char *M, Image input,Image img, size_t *cut_list_length){
         return matrix_list;
     }
     else{
-        for (int i = 0; i < *cut_list_length; ++i) {
+        for (size_t i = 0; i < *cut_list_length; ++i) {
             *(cut_list+i)+=img.begin_w;
         }
         // Proceed the matrix cutting for each column of the cut-list
@@ -221,7 +222,7 @@ Image* cols(char *M, char word, Image input,Image img, size_t *cut_list_length){
         return matrix_list;
     }
     else{
-        for (int i = 0; i < *cut_list_length; ++i) {
+        for (size_t i = 0; i < *cut_list_length; ++i) {
             cut_list[i]+=img.begin_h;
         }
         Image *matrix_list =
