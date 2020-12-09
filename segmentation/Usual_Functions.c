@@ -5,6 +5,7 @@
 #include "Usual_Functions.h"
 #include "Cutting.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 //##############################################################################
 //#                       Usual fonctions for the cutting                      #
@@ -20,7 +21,7 @@ void cut_matrix(struct Image img,struct Image matrix_list[],int *cut_list
         ,int length,char vertical){
     if (length==0){
         struct Image matrix_list[1]={img};
-        return matrix_list;
+        return;
     }
     if (vertical){                  // (length cuts= length+1 structs)
         // Allow to have length matrix from one matrix

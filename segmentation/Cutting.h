@@ -4,7 +4,8 @@
 
 #ifndef OCR_CUTTING_H
 #define OCR_CUTTING_H
-
+#include <stdio.h>
+#include <stdlib.h>
 #define SIZE
 
 typedef struct Image Image;

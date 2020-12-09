@@ -5,6 +5,7 @@
 #include "Cutting.h"
 #include "Usual_Functions.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 
 // Vertical scan of the image (matrix) in order to list the different vertical blocks
