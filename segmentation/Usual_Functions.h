@@ -18,8 +18,7 @@ size_t* thresholding(size_t H[],size_t Hlength,size_t s,size_t length,
 char* square_reshaped(char *M, Image input,  Image img, char
 *new_M, char vertical);
 void wipe_white_borders(char *M, Image input, Image img);
-Image* concatenate(Image *matrix_list2,Image *matrix_list,size_t
-*matrix_list2_length,size_t *matrix_list_length);
+void concatenate(Image *M1,Image *M2,size_t *M1_length,size_t *M2_length);
 
 #endif //OCR_USUAL_FUNCTIONS_H
 

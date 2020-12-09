@@ -216,6 +216,18 @@ char* square_reshaped(char *M,Image input, Image img, char
     return new_M;
 }
 
+void concatenate(Image *M1,Image *M2,size_t *M1_length,size_t *M2_length){
+    M1 = (Image *) realloc(M1, (*M1_length+*M2_length) * sizeof
+    (Image));
+    size_t i=0;
+    size_t size_1=*M1_length;
+    while(i<*M2_length){
+        *(M1+size_1+i)=*(M2+i);
+        i++;
+    }
+    *M1_length+=i;
+}
+
 /*
 char* adjust_matrix_size(char *M,Image input, Image img, char
 *new_M, char vertical){
