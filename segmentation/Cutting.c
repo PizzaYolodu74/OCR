@@ -15,7 +15,7 @@
 // we use the h or v boolean var to know if the last call was negative or not
 // return the list of cut matrix
 // The input struct is for the initial picture, struct img is the actual image.
-Image[] vertical(char*M,Image input,Image img,char h,
+Image* vertical(char*M,Image input,Image img,char h,
         size_t s,size_t *cut_list_length){
 
     // Creates the histogram whose variables are the number of white pixels
@@ -31,32 +31,30 @@ Image[] vertical(char*M,Image input,Image img,char h,
     // Handles thresholding using the threshold and the full histogram
     /// todo: test si *cut_list_length bien est utilisé pour l'array
     /// après l'appel de thresholding
-    size_t cut_list[*cut_list_length] =
-            thresholding(HV,img.width,s,img.height,cut_list_length);
+    size_t *cut_list = thresholding(HV,img.width,s,img.height,cut_list_length);
 
     // We make a list of cut areas and if this one is empty we will stop
     // either if the horizontal call is negative either immediately if the
     // last horizontal call was negative
     if (cut_list_length==0 && h==0){
-        Image matrix_list[1]={img};
+        Image *matrix_list=(Image*)malloc(sizeof(Image));
+        *matrix_list=img;
         return matrix_list;
     }
     else{
         if (cut_list_length==0){
-            return horizontal(M,img,0,s,cut_list_length);
+            return horizontal(M,input,img,0,s,cut_list_length);
         }
         else{
-        ////////////////////////////////////////////////////////////
-/// todo:je fais un +begin.h (et .w sur horizontal) sur chaque membre de
-/// cut_list car pour le moment on considere que le begin.h(ou .w) commence a
-/// 0, ce qui est faux si on est sur des sous-blocks
+//todo:commente ici
             for (int i = 0; i < *cut_list_length; ++i) {
-                cut_list[i]+=begin.h;
+                cut_list[i]+=img.begin_h;
             }
-///////////////////////////////////////////////////////////////////////////
+
             // Proceed the matrix cutting for each column of the cut-list
-            Image matrix_list[cut_list_length+1];
-            cut_matrix(M,img,matrix_list,cut_list,cut_list_length,1);
+            Image *matrix_list=
+                    (Image*) malloc(*(cut_list_length+1)*sizeof(Image));
+            cut_matrix(img,matrix_list,cut_list,*cut_list_length,1);
 
             // Make a recursive horizontal call for each of the new matrix
             size_t *matrix_list2_length=0;
@@ -64,24 +62,18 @@ Image[] vertical(char*M,Image input,Image img,char h,
             // The concatenate function modify matrix_list2_length to
             // the new concatenate size
             size_t *cut_Hlist_length;
-/// todo: test si *matrix_list2_length bien est utilisé pour l'array
-/// après l'appel de concatenate
-            Image matrix_list2[*matrix_list2_length]=
-                    concatenate(matrix_list2,horizontal
-                    (M,matrix_list[pos],1,s,cut_Hlist_length)
-                            ,matrix_list2_length,cut_Hlist_length);
-            free(cut_Hlist_length);
+            Image *matrix_list2 = concatenate(matrix_list2,horizontal
+                    (M,input,*(matrix_list),1,s,cut_Hlist_length)
+                    ,matrix_list2_length,cut_Hlist_length);
+            ///free(cut_Hlist_length);
 /// todo: verifier qu'il faut bien un +1 a cut_list_length
-            for (int pos = 1; pos < cut_list_length+1; ++pos) {
-                size_t *cut_Hlist_length;
-/// todo: test si *matrix_list2_length bien est utilisé pour l'array
-/// après l'appel de concatenate
-                Image matrix_list2[matrix_list2_length]=
-                        concatenate(matrix_list2,horizontal
-                        (M,matrix_list[pos],1,s,cut_Hlist_length)
-                                    ,matrix_list2_length,cut_Hlist_length);
-                free(cut_Hlist_length);
+            for (size_t pos = 1; pos < *(cut_list_length+1); ++pos) {
+                *cut_Hlist_length=0;
+                Image *matrix_list2 = concatenate(matrix_list2,horizontal
+                        (M,input,*(matrix_list+pos),1,s,cut_Hlist_length)
+                        ,matrix_list2_length,cut_Hlist_length);
             }
+            free(cut_Hlist_length);
             *cut_list_length=*matrix_list2_length;
             free(matrix_list2_length);
             return matrix_list2;
@@ -98,7 +90,7 @@ Image[] vertical(char*M,Image input,Image img,char h,
 // we use the h or v boolean var to know if the last call was negative or not
 // return the list of cut matrix
 // The input struct is for the initial picture, struct img is the actual image.
-Image[] horizontal(char*M,Image input, Image img,char v,
+Image* horizontal(char*M,Image input, Image img,char v,
         size_t s,size_t *cut_list_length){
     // Creates the histogram whose variables are the number of white pixels
     // on each row of the matrix
@@ -111,33 +103,30 @@ Image[] horizontal(char*M,Image input, Image img,char v,
     }
     // Handles thresholding using the threshold and the full histogram
     /// todo: test si *cut_list_length bien est utilisé pour l'array après l'appel de thresholding
-    size_t cut_list[*cut_list_length] = thresholding(HH,img.height,s,img.width,cut_list_length);
+    size_t *cut_list = thresholding(HH,img.height,s,img.width,cut_list_length);
 
     // We make a list of cut areas and if this one is empty we will stop either if
     // the horizontal call is negative either immediately if the last horizontal call was negative
     if (cut_list_length==0 && v==0){
-        Image matrix_list[1]={img};
+        Image *matrix_list=(Image*) malloc(sizeof(Image));
+        *matrix_list=img;
         return matrix_list;
     }
     else{
 
         if (cut_list_length==0){
-            return vertical(M,img,0,s,cut_list_length);
+            return vertical(M,input,img,0,s,cut_list_length);
         }
         else{
-            ////////////////////////////////////////////////////////////
-/// todo:je fais un +begin.h (et .w sur horizontal) sur chaque membre de
-/// cut_list car pour le moment on considere que le begin.h(ou .w) commence a
-/// 0, ce qui est faux si on est sur des sous-blocks
             for (int i = 0; i < *cut_list_length; ++i) {
-                cut_list[i]+=begin.w;
+                cut_list[i]+=img.begin_w;
             }
-///////////////////////////////////////////////////////////////////////////
 
             // Proceed the matrix cutting for each column of the cut-list
-            Image matrix_list[cut_list_length+1];
+            Image *matrix_list=(Image*) malloc(*(cut_list_length+1)*sizeof
+                    (Image));
             ///todo:tester si un array se comporte comme une liste python
-            cut_matrix(M,img,matrix_list,cut_list,cut_list_length,0);
+            cut_matrix(img,matrix_list,cut_list,*cut_list_length,0);
 
             // Make a recursive horizontal call for each of the new matrix
             size_t *matrix_list2_length=0;
@@ -145,19 +134,19 @@ Image[] horizontal(char*M,Image input, Image img,char v,
             // The concatenate function modify matrix_list2_length to the new concatenate size
             size_t *cut_Vlist_length;
             /// todo: test si *matrix_list2_length bien est utilisé pour l'array après l'appel de concatenate
-            Image matrix_list2[*matrix_list2_length]=
-                    concatenate(matrix_list2,horizontal(M,matrix_list[pos],1,s,cut_Vlist_length)
-                            ,matrix_list2_length,cut_Vlist_length);
-            free(cut_Vlist_length);
+            Image *matrix_list2 = concatenate(matrix_list2,horizontal
+                    (M,input,*(matrix_list),1,s,cut_Vlist_length)
+                    ,matrix_list2_length,cut_Vlist_length);
+            ///free(cut_Vlist_length);
 /// todo: verifier qu'il faut bien un +1 a cut_list_length
-            for (int pos = 1; pos < cut_list_length+1; ++pos) {
-                size_t *cut_Vlist_length;
+            for (size_t pos = 1; pos < *(cut_list_length+1); ++pos) {
+                *cut_Vlist_length=0;
                 /// todo: test si *matrix_list2_length bien est utilisé pour l'array après l'appel de concatenate
-                Image matrix_list2[matrix_list2_length]=
-                        concatenate(matrix_list2,vertical(M,matrix_list[pos],1,s,cut_Vlist_length)
-                                ,matrix_list2_length,cut_Vlist_length);
-                free(cut_Vlist_length);
+                Image *matrix_list2 = concatenate(matrix_list2,vertical
+                (M,input,*(matrix_list+pos),1,s,cut_Vlist_length)
+                ,matrix_list2_length,cut_Vlist_length);
             }
+            free(cut_Vlist_length);
             *cut_list_length=*matrix_list2_length;
             free(matrix_list2_length);
             return matrix_list2;
@@ -168,7 +157,7 @@ Image[] horizontal(char*M,Image input, Image img,char v,
 }
 
 
-Image[] lines(char *M, Image input,Image img, size_t
+Image* lines(char *M, Image input,Image img, size_t
         *cut_list_length){
     // Creates the histogram whose variables are the number of white pixels on each row of the matrix
     size_t HL[img.height];
@@ -183,36 +172,32 @@ Image[] lines(char *M, Image input,Image img, size_t
     size_t s = (size_t) 0.25*img.width;
     // Handles thresholding using the threshold and the full histogram
     /// todo: test si *cut_list_length bien est utilisé pour l'array après l'appel de thresholding
-    size_t cut_list[*cut_list_length] = thresholding(HL,img.height,s,img.width,cut_list_length);
+    size_t *cut_list = thresholding(HL,img.height,s,img.width,cut_list_length);
 
     // We make a list of cut areas and if this one is empty we will stop either if
     // the horizontal call is negative either immediately if the last horizontal call was negative
     if (cut_list_length==0){
-        Image matrix_list[1]={img};
+        Image *matrix_list=(Image*)malloc(sizeof(Image));
+        *matrix_list=img;
         return matrix_list;
     }
     else{
-        ////////////////////////////////////////////////////////////
-/// todo:je fais un +begin.h (et .w sur horizontal) sur chaque membre de
-/// cut_list car pour le moment on considere que le begin.h(ou .w) commence a
-/// 0, ce qui est faux si on est sur des sous-blocks
         for (int i = 0; i < *cut_list_length; ++i) {
-            cut_list[i]+=begin.w;
+            cut_list[i]+=img.begin_w;
         }
-///////////////////////////////////////////////////////////////////////////
-
-        Image matrix_list[cut_list_length+1];
+        Image *matrix_list=(Image*) malloc(*(cut_list_length+1)*sizeof(Image));
         ///todo:tester si un array se comporte comme une liste python
-        cut_matrix(M,img,matrix_list,cut_list,cut_list_length,0);
+        cut_matrix(img,matrix_list,cut_list,*cut_list_length,0);
         return matrix_list;
     }
 
     //free useless pointers todo: à faire en dehors de la fonction!
     // free(cut_list_length);
+    // free(matrix_list)
 }
 
 ///todo: fonction seuil words et chars (pour s)
-Image[] cols(char *M, size_t s, Image input,Image img, size_t *cut_list_length){
+Image* cols(char *M, size_t s, Image input,Image img, size_t *cut_list_length){
     // Creates the histogram whose variables are the number of white pixels on each row of the matrix
     size_t HC[img.width];
     create_histogram(img.width, HC);
@@ -224,26 +209,22 @@ Image[] cols(char *M, size_t s, Image input,Image img, size_t *cut_list_length){
 
     // Handles thresholding using the threshold and the full histogram
     /// todo: test si *cut_list_length bien est utilisé pour l'array après l'appel de thresholding
-    size_t cut_list[*cut_list_length] = thresholding(HC,img.width,s,img.height,cut_list_length);
+    size_t *cut_list = thresholding(HC,img.width,s,img.height,cut_list_length);
 
     // We make a list of cut areas and if this one is empty we will stop either if
     // the horizontal call is negative either immediately if the last horizontal call was negative
     if (cut_list_length==0){
-        Image matrix_list[1]={img};
+        Image *matrix_list=(Image*)malloc(sizeof(Image));
+        *matrix_list=img;
         return matrix_list;
     }
     else{
-        ////////////////////////////////////////////////////////////
-/// todo:je fais un +begin.h (et .w sur horizontal) sur chaque membre de
-/// cut_list car pour le moment on considere que le begin.h(ou .w) commence a
-/// 0, ce qui est faux si on est sur des sous-blocks
         for (int i = 0; i < *cut_list_length; ++i) {
-            cut_list[i]+=begin.h;
+            cut_list[i]+=img.begin_h;
         }
-///////////////////////////////////////////////////////////////////////////
-        Image matrix_list[cut_list_length+1];
+        Image *matrix_list=(Image*) malloc(*(cut_list_length+1)*sizeof(Image));
         ///todo:tester si un array se comporte comme une liste python
-        cut_matrix(M,img,matrix_list,cut_list,cut_list_length,1);
+        cut_matrix(img,matrix_list,cut_list,*cut_list_length,1);
         return matrix_list;
     }
     //free useless pointers todo: à faire en dehors de la fonction!

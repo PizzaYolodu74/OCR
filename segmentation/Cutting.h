@@ -16,13 +16,13 @@ struct Image
     size_t height;
     size_t width;
 };
-Image[] vertical(char*M,Image input,Image img,char h,
+Image* vertical(char*M,Image input,Image img,char h,
                         size_t s,size_t *cut_list_length);
-Image[] horizontal(char*M,Image input, Image img,
+Image* horizontal(char*M,Image input, Image img,
         char v, size_t s,size_t *cut_list_length);
-Image[] lines(char *M, Image input,Image img,
+Image* lines(char *M, Image input,Image img,
         size_t*cut_list_length);
-Image[] cols(char *M, size_t s, Image input,Image img
+Image* cols(char *M, size_t s, Image input,Image img
         , size_t *cut_list_length);
 
 #endif //OCR_CUTTING_H

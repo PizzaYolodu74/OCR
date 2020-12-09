@@ -15,12 +15,21 @@
 // Cut the matrix according to the i or j cut_list depending of height or width
 // the cutting function preserve the reading direction because in occidental
 // language,
-// we read from top to bottom and from left to right as the cutting function work
+// we read from top to bottom and from left to right as the cutting function
+// work
 
-void cut_matrix(Image img,Image matrix_list[],size_t *cut_list
+///todo:faire fonction concatenate
+///todo:fonction concatenate
+///todo:fonction concatenate
+///todo:fonction concatenate
+///todo:fonction concatenate
+///todo:fonction concatenate
+///todo:fonction concatenate
+
+void cut_matrix(Image img,Image *matrix_list,size_t *cut_list
         ,size_t length,char vertical){
     if (length==0){
-        Image matrix_list[1]={img};
+        *matrix_list=img;
         return;
     }
     if (vertical){                  // (length cuts= length+1 structs)
@@ -34,7 +43,7 @@ void cut_matrix(Image img,Image matrix_list[],size_t *cut_list
                     height,         // height
                     img.width,      // width
             };
-            matrix_list[posi]=new_img;
+            *(matrix_list+posi)=new_img;
             pos=*(cut_list+posi);   // move the origin to the next position
         }
         Image new_img = {
@@ -43,7 +52,7 @@ void cut_matrix(Image img,Image matrix_list[],size_t *cut_list
                 img.height+img.begin_h-pos,// height
                 img.width,            // width
         };
-        matrix_list[length]=new_img;
+        *(matrix_list+length)=new_img;
 
     }
     else{
@@ -57,16 +66,16 @@ void cut_matrix(Image img,Image matrix_list[],size_t *cut_list
                     img.height,     // height
                     width,          // width
             };
-            matrix_list[posi]=new_img;
+            *(matrix_list+posi)=new_img;
             pos=*(cut_list+posi);   // move the origin to the next position
         }
         Image new_img = {
-                img.begin_h               // begin_h
+                img.begin_h,               // begin_h
                 pos,                      // begin_w
                 img.height,               // height
                 img.width+img.begin_w-pos,// width
         };
-        matrix_list[length]=new_img;
+        *(matrix_list+length)=new_img;
     }
 }
 
@@ -81,7 +90,7 @@ void create_histogram(size_t size,size_t H[]){
 // Using the threshold and the length of the matrix,
 // return a list of row(or columns) where we will need to cut
 
-size_t[] thresholding(size_t H[],size_t Hlength,size_t s,
+size_t* thresholding(size_t H[],size_t Hlength,size_t s,
                       size_t length,size_t *cut_list_length){
     // Return where we need to cut in function of the threshold
     size_t cut_list[length];
@@ -108,9 +117,9 @@ size_t[] thresholding(size_t H[],size_t Hlength,size_t s,
     }
 
     // Adjust the cut_list matrix to be of length *cut_list_length
-    size_t new_cut_list[*cut_list_length];
+    size_t *new_cut_list=(size_t*) malloc(*cut_list_length * sizeof(size_t));
     for(size_t i=0;i<*cut_list_length;++i){
-        new_cut_list[i]=cut_list[i];
+        *(new_cut_list+i)=cut_list[i];
     }
     return new_cut_list;
 }
@@ -161,7 +170,7 @@ void wipe_white_borders(char *M,Image input,Image img){
         /// totalement vide, pour le moment la structure reste juste vide
         return;
     ///todo: si un pb, ça peut venir d'ici
-    while (height_max>begin.h && HH[height_max-1]==img.width){
+    while (height_max>img.begin_h && HH[height_max-1]==img.width){
         img.height--;
         height_max--;
     }
@@ -243,7 +252,8 @@ char* adjust_matrix_size(char *M,Image input, Image img, char
  */
 
 /* todo: resize >16 cassé
-char* resize(char *M,size_t left,size_t right,size_t l,size_t left0,size_t right0,size_t l0){
+char* resize(char *M,size_t left,size_t right,size_t l,size_t left0
+ ,size_t right0,size_t l0){
     char newM[right-left];
     for (size_t i = left; i < right; ++i) {
         newM[i-left]=M[i];
