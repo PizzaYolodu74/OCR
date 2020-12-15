@@ -4,26 +4,12 @@
 
 #include "bilinear_interpolation.h"
 
-/*
-//USUAL METHODS FOR SDL images
-SDL_Surface* img;
-img = load_image("my_image.jpg");
-int width=img->w;
-int height->h;
 
-Uint8 r, g ,b;//changer en int si on fait des calculs dessin
-SDL_GetRGB(pixel, img->format, &r, &g, &b);
-Uint32 pixel;
-pixel = get_pixel(img, h, l);//h represente la hauteur!
-pixel = SDL_MapRGB(img->format, 255, 255, 255);//place les valeurs rgb
-putpixel(output_img,i,j,pixel);
-*/
-
-
-// Function that performs bilinear interpolation to determine the pixel
-// value of a new pixel.
+// Function that performs bilinear interpolation to determine the new pixel
+// value.
 float bilinearly_interpolate (int top, int bottom, int left, int right,
-                              float horizontal_position, float vertical_position, SDL_surface* img)
+                              float horizontal_position, float
+                              vertical_position, SDL_Surface* img)
 {
     // Determine the values of the corners.
 
@@ -45,24 +31,21 @@ float bilinearly_interpolate (int top, int bottom, int left, int right,
     float bottom_right = rbr;
 
     // Figure out "how far" the output pixel being considered is
-    // between *_left and *_right.
+    // between left and right.
     float horizontal_progress = horizontal_position -
                                 (float) left;
     float vertical_progress = vertical_position -
                               (float) top;
 
-    // Combine top_left and top_right into one large, horizontal
-    // block.
+    // Combine top values.
     float top_block = top_left + horizontal_progress
                                  * (top_right - top_left);
-
-    // Combine bottom_left and bottom_right into one large, horizontal
-    // block.
+    // Combine bottom values.
     float bottom_block = bottom_left +
                          horizontal_progress
                          * (bottom_right - bottom_left);
 
-    // Combine the top_block and bottom_block using vertical
-    // interpolation and return as the resulting pixel.
+    // Combine top and bottom using vertical interpolation.
+    // Return the resulting pixel.
     return top_block + vertical_progress * (bottom_block - top_block);
 }

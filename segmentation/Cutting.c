@@ -33,7 +33,10 @@ Image* vertical(Uint8*M,Image input,Image img,Uint8 h,
     // last vertical call was negative.
     if (*cut_list_length==0 && h==0){
         Image *matrix_list=(Image*) malloc(sizeof(Image));
-        *matrix_list=img;
+        matrix_list->height=img.height;
+        matrix_list->width=img.width;
+        matrix_list->begin_w=img.begin_w;
+        matrix_list->begin_h=img.begin_h;
         return matrix_list;
     }
     else{
@@ -99,7 +102,10 @@ Image* horizontal(Uint8*M,Image input, Image img,Uint8 v,
     // last horizontal call was negative
     if (*cut_list_length==0 && v==0){
         Image *matrix_list = (Image*) malloc(sizeof(Image));
-        *matrix_list=img;
+        matrix_list->height=img.height;
+        matrix_list->width=img.width;
+        matrix_list->begin_w=img.begin_w;
+        matrix_list->begin_h=img.begin_h;
         return matrix_list;
     }
     else{
@@ -161,7 +167,10 @@ Image* lines(Uint8 *M, Image input,Image img, size_t *cut_list_length){
     // Make a list of cut_areas
     if (*cut_list_length==0){
         Image *matrix_list = (Image*) malloc(sizeof(Image));
-        *matrix_list=img;
+        matrix_list->height=img.height;
+        matrix_list->width=img.width;
+        matrix_list->begin_w=img.begin_w;
+        matrix_list->begin_h=img.begin_h;
         return matrix_list;
     }
     else{
@@ -210,7 +219,10 @@ Image* cols(Uint8 *M, Uint8 word, Image input,Image img,
     // Make a list of cut_areas.
     if (*cut_list_length==0){
         Image *matrix_list=malloc(sizeof(Image));
-        *matrix_list=img;
+        matrix_list->height=img.height;
+        matrix_list->width=img.width;
+        matrix_list->begin_w=img.begin_w;
+        matrix_list->begin_h=img.begin_h;
         return matrix_list;
     }
     else{

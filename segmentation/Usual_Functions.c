@@ -25,62 +25,45 @@ void cut_matrix(Image img,Image *matrix_list,size_t *cut_list
     if (vertical==1){
 
         // Allow to have length+1 matrix from one matrix
-        // Create new_img struct that are cut matrix.
+        // Add new cut matrix using the Image struct in the return pointer
+        // matrix_list.
         size_t pos = img.begin_h;
         for (size_t posi = 0; posi < length; ++posi) {
             size_t height = *(cut_list+posi)-pos;
-            Image new_img = {
-                    pos,            // begin_h
-                    img.begin_w,    // begin_w
-                    height,         // height
-                    img.width       // width
-            };
-            (*(matrix_list+posi)).width=new_img.width;
-            (*(matrix_list+posi)).height=new_img.height;
-            (*(matrix_list+posi)).begin_w=new_img.begin_w;
-            (*(matrix_list+posi)).begin_h=new_img.begin_h;
+
+            (*(matrix_list+posi)).begin_h=pos;
+            (*(matrix_list+posi)).begin_w=img.begin_w;
+            (*(matrix_list+posi)).height=height;
+            (*(matrix_list+posi)).width=img.width;
             pos=*(cut_list+posi);   // move the origin to the next position
         }
-        Image new_img = {
-                pos,                  // begin_h
-                img.begin_w,          // begin_w
-                img.height+img.begin_h-pos,// height
-                img.width             // width
-        };
-        (*(matrix_list+length)).width=new_img.width;
-        (*(matrix_list+length)).height=new_img.height;
-        (*(matrix_list+length)).begin_w=new_img.begin_w;
-        (*(matrix_list+length)).begin_h=new_img.begin_h;
+
+        (*(matrix_list+length)).begin_h=pos;
+        (*(matrix_list+length)).begin_w=img.begin_w;
+        (*(matrix_list+length)).height=img.height+img.begin_h-pos;
+        (*(matrix_list+length)).width=img.width;
+
     }
     else{
         // Allow to have length+1 matrix from one matrix
-        // Create new_img struct that are cut matrix.
+        // Add new cut matrix using the Image struct in the return pointer
+        // matrix_list.
         size_t pos = img.begin_w;
         for (size_t posi = 0; posi < length; ++posi) {
             size_t width = *(cut_list+posi)-pos;
-            Image new_img = {
-                    img.begin_h,    // begin_h
-                    pos,            // begin_w
-                    img.height,     // height
-                    width           // width
-            };
-            (*(matrix_list+posi)).width=new_img.width;
-            (*(matrix_list+posi)).height=new_img.height;
-            (*(matrix_list+posi)).begin_w=new_img.begin_w;
-            (*(matrix_list+posi)).begin_h=new_img.begin_h;
+
+            (*(matrix_list+posi)).begin_h=img.begin_h;
+            (*(matrix_list+posi)).begin_w=pos;
+            (*(matrix_list+posi)).height=img.height;
+            (*(matrix_list+posi)).width=width ;
+
+
             pos=*(cut_list+posi);   // move the origin to the next position
         }
-        Image new_img = {
-                img.begin_h,              // begin_h
-                pos,                      // begin_w
-                img.height,               // height
-                img.width+img.begin_w-pos // width
-        };
-        (*(matrix_list+length)).width=new_img.width;
-        (*(matrix_list+length)).height=new_img.height;
-        (*(matrix_list+length)).begin_w=new_img.begin_w;
-        (*(matrix_list+length)).begin_h=new_img.begin_h;
-
+        (*(matrix_list+length)).begin_h=img.begin_h;
+        (*(matrix_list+length)).begin_w=pos;
+        (*(matrix_list+length)).height=img.height;
+        (*(matrix_list+length)).width=img.width+img.begin_w-pos ;
     }
 }
 
